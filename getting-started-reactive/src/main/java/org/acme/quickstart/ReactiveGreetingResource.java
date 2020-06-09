@@ -6,9 +6,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.jboss.resteasy.annotations.SseElementType;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
-import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.Multi;
 
 @Path("hello")
 public class ReactiveGreetingResource {
@@ -18,15 +19,23 @@ public class ReactiveGreetingResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("greeting/{name}")
-    public Uni<String> greeting(@PathParam String name) {
-        return service.greeting(name);
+    public String hello() {
+        return "hello";
     }
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "hello";
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("greeting/{count}/{name}")
+    public Multi<String> greetings(@PathParam int count, @PathParam String name) {
+        return service.greeting(count, name);
+    }
+
+    @GET
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    @SseElementType(MediaType.TEXT_PLAIN)
+    @Path("stream/{count}/{name}")
+    public Multi<String> greetingsAsStream(@PathParam int count, @PathParam String name) {
+        return service.greeting(count, name);
     }
 
 }
